@@ -15,7 +15,7 @@ logger "Running"
 # Get Public IP address
 PRIVATE_DNS=$(curl http://169.254.169.254/latest/meta-data/hostname)
 
-echo ${PRIVATE_DNS}
+echo $${PRIVATE_DNS}
 
 # User setup
 USER_NAME="vault"
