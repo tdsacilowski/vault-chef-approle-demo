@@ -10,6 +10,11 @@ resource "aws_kms_key" "vault" {
   }
 }
 
+resource "aws_kms_alias" "vault" {
+  name          = "${var.environment_name}-vault-kms-unseal-key"
+  target_key_id = "${aws_kms_key.vault.key_id}"
+}
+
 resource "aws_instance" "vault" {
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.instance_type}"
