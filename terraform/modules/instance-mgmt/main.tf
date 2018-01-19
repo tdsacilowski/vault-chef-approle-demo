@@ -25,7 +25,7 @@ resource "aws_instance" "vault" {
   iam_instance_profile        = "${aws_iam_instance_profile.vault.id}"
 
   tags {
-    Name = "${var.environment_name}"
+    Name = "${var.environment_name}-vault-server"
   }
 
   user_data = "${data.template_file.vault.rendered}"

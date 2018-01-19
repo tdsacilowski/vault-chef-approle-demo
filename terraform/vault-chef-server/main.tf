@@ -6,7 +6,7 @@ provider "aws" {
 // Modules
 
 module "vault_instance" {
-  source = "../modules/vault-instance"
+  source = "../modules/instance-mgmt"
 
   aws_region       = "${var.aws_region}"
   environment_name = "${var.environment_name}"
