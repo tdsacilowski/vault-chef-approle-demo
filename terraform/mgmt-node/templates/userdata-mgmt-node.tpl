@@ -30,17 +30,15 @@ S3_BUCKET="${tpl_s3_bucket_name}"
 VAULT_ZIP="${tpl_vault_zip_file}"
 
 # Chef
-CHEF_SERVER_PACKAGE="chef-server-core_12.17.15-1_amd64.deb"
-CHEF_SERVER_PACKAGE_URL="https://packages.chef.io/files/stable/chef-server/12.17.15/ubuntu/16.04/chef-server-core_12.17.15-1_amd64.deb"
-CHEF_DK_PACKAGE="chefdk_2.4.17-1_amd64.deb"
-CHEF_DK_PACKAGE_URL="https://packages.chef.io/files/stable/chefdk/2.4.17/ubuntu/16.04/chefdk_2.4.17-1_amd64.deb"
+CHEF_SERVER_PACKAGE_URL="${tpl_chef_server_package_url}"
+CHEF_DK_PACKAGE_URL="${tpl_chef_dk_package_url}"
 CHEF_SERVER_URL="https://$${PRIVATE_DNS}"
-CHEF_ADMIN="demo-admin"
-CHEF_ADMIN_PASSWORD="PASSWORD"
+CHEF_ADMIN="${tpl_chef_admin}"
+CHEF_ADMIN_PASSWORD="${tpl_chef_admin_password}"
 CHEF_ADMIN_PEM="$${CHEF_ADMIN}-private-key.pem"
-CHEF_DEMO_ORG="demo-org"
+CHEF_DEMO_ORG="${tpl_chef_org}"
 CHEF_DEMO_PEM="$${CHEF_DEMO_ORG}-validator.pem"
-CHEF_DEMO_APP_NAME="vault-chef-approle-demo"
+CHEF_DEMO_APP_NAME="${tpl_chef_app_name}"
 
 # Detect package management system.
 YUM=$(which yum 2>/dev/null)
@@ -240,15 +238,20 @@ sudo systemctl enable vault
 sudo systemctl start vault
 
 ##--------------------------------------------------------------------
+## Vault Init, Configure Policies & Backends
+
+
+
+##--------------------------------------------------------------------
 ## Install Chef Server & Chef DK
 
 # Download Chef packages
-sudo curl -o /tmp/$${CHEF_SERVER_PACKAGE} $${CHEF_SERVER_PACKAGE_URL}
-sudo curl -o /tmp/$${CHEF_DK_PACKAGE} $${CHEF_DK_PACKAGE_URL}
+sudo curl -o /tmp/chef-server-core.deb $${CHEF_SERVER_PACKAGE_URL}
+sudo curl -o /tmp/chefdk.deb $${CHEF_DK_PACKAGE_URL}
 
 # Install Chef packages
-sudo dpkg -i /tmp/$${CHEF_SERVER_PACKAGE}
-sudo dpkg -i /tmp/$${CHEF_DK_PACKAGE}
+sudo dpkg -i /tmp/chef-server-core.deb
+sudo dpkg -i /tmp/chefdk.deb
 
 # Configure Chef Server (need to do this after installing Chef Server package)
 sudo chef-server-ctl reconfigure

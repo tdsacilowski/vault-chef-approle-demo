@@ -161,12 +161,18 @@ data "aws_iam_policy_document" "vault" {
 }
 
 data "template_file" "vault" {
-  template = "${file("${path.module}/userdata.tpl")}"
+  template = "${file("${path.module}/templates/userdata-mgmt-node.tpl")}"
 
   vars = {
-    tpl_aws_region     = "${var.aws_region}"
-    tpl_kms_key        = "${aws_kms_key.vault.id}"
-    tpl_s3_bucket_name = "${var.s3_bucket_name}"
-    tpl_vault_zip_file = "${var.vault_zip_file}"
+    tpl_aws_region              = "${var.aws_region}"
+    tpl_kms_key                 = "${aws_kms_key.vault.id}"
+    tpl_s3_bucket_name          = "${var.s3_bucket_name}"
+    tpl_vault_zip_file          = "${var.vault_zip_file}"
+    tpl_chef_server_package_url = "${var.chef_server_package_url}"
+    tpl_chef_dk_package_url     = "${var.chef_dk_package_url}"
+    tpl_chef_admin              = "${var.chef_admin}"
+    tpl_chef_admin_password     = "${var.chef_admin_password}"
+    tpl_chef_org                = "${var.chef_org}"
+    tpl_chef_app_name           = "${var.chef_app_name}"
   }
 }

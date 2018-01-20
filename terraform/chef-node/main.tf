@@ -109,7 +109,7 @@ data "aws_ami" "ubuntu" {
 }
 
 data "template_file" "role-id" {
-  template = "${file("${path.module}/userdata.tpl")}"
+  template = "${file("${path.module}/templates/userdata-chef-node.tpl")}"
 
   vars = {
     tpl_role_id = "${data.vault_generic_secret.approle.data_json}"
