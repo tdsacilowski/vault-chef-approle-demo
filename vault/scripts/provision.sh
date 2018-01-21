@@ -1,49 +1,60 @@
 #!/usr/bin/env bash
-set -e
+set -x
 
-shopt -s nullglob
+# Initialize Vault
+vault init -stored-shares=1 -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1
 
-function provision() {
-    set +e
-    pushd "$1" > /dev/null
-    for f in $(ls "$1"/*.json); do
-      p="$1/${f%.json}"
-
-      if [[ $1 =~ ^sys/policy.* ]]
-      then
-          string="$(echo "$(cat ${f})" | jq '@json')"
-          payload='{"rules":'"${string}"'}'
-      else
-          payload="$(cat ${f})"
-      fi
-
-      curl \
-        --location \
-        --header "X-Vault-Token: ${VAULT_TOKEN}" \
-        --data "$(echo "${payload}")" \
-        --silent \
-        "${VAULT_ADDR}/v1/${p}" \
-        | jq .
-    done
-    popd > /dev/null
-    set -e
+# AppRole policy
+tee te-policy-app-1.hcl <<EOF
+path "secret/app-1/*" {
+  capabilities = ["create", "read", "update", "delete", "list"]
 }
+EOF
 
-curl \
-    --request PUT \
-    --data @data/sys/init/init.json \
-    $VAULT_ADDR/v1/sys/init > init-response.json
+# Write policy
+vault write sys/policy/te-policy-app-1 policy=@te-policy-app-1.hcl
 
-export VAULT_TOKEN=$(cat init-response.json | jq -r .root_token)
+# Enable AppRole auth backend
+vault auth-enable approle
 
-#echo "Verifying Vault is unsealed"
-#vault status > /dev/null
+# Create AppRole role and associate policy
+vault write auth/approle/role/app-1 \
+    secret_id_ttl=10m \
+    token_num_uses=10 \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=1 \
+    policies=te-policy-app-1
 
-pushd data >/dev/null
-provision sys/auth
-#provision sys/mounts
-provision sys/policy
-#provision postgresql/config
-#provision postgresql/roles
-provision auth/approle/roles
-popd > /dev/null
+# Policy to retrieve Secret ID for AppRole
+tee te-policy-app-1-secretID.hcl <<EOF
+path "auth/approle/role/app-1/secret-id" {
+    capabilities = ["update"]
+}
+EOF
+
+# Write policy
+vault write sys/policy/te-policy-app-1-secretID \
+    policy=@te-policy-app-1-secretID.hcl
+
+# Policy to retrieve Role ID for AppRole
+tee te-policy-app-1-roleID.hcl <<EOF
+path "auth/approle/role/app-1/role-id" {
+    capabilities = ["read"]
+}
+# For Terraform
+# See: https://www.terraform.io/docs/providers/vault/index.html#token
+path "/auth/token/create" {
+    capabilities = ["update"]
+}
+EOF
+
+# Write policy
+vault write sys/policy/te-policy-app-1-roleID \
+    policy=@te-policy-app-1-roleID.hcl
+
+# Token to retrieve Secret IDs
+vault token-create -policy="te-policy-app-1-secretID"
+
+# Token to retrieve Role IDs
+vault token-create -policy="te-policy-app-1-roleID"
