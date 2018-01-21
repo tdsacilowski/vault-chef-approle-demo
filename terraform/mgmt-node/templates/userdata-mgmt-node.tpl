@@ -240,7 +240,8 @@ sudo systemctl start vault
 ##--------------------------------------------------------------------
 ## Vault Init, Configure Policies & Backends
 
-
+cd /home/ubuntu
+git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
 
 ##--------------------------------------------------------------------
 ## Install Chef Server & Chef DK
@@ -292,8 +293,9 @@ knife ssl check
 
 # Clone demo cookbook
 cd /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks
-git clone https://github.com/learn-chef/learn_chef_apache2.git
-knife cookbook upload learn_chef_apache2
+cp -R /home/ubuntu/vault-chef-approle-demo/* /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks/
+#git clone https://github.com/learn-chef/learn_chef_apache2.git
+knife cookbook upload vault_chef_approle_demo
 
 chown -R ubuntu:ubuntu /home/ubuntu
 
