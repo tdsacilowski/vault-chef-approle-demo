@@ -293,7 +293,7 @@ knife ssl check
 
 # Clone demo cookbook
 cd /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks
-cp -R /home/ubuntu/vault-chef-approle-demo/* /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks/
+cp -R /home/ubuntu/vault-chef-approle-demo/chef/cookbooks/* /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks/
 #git clone https://github.com/learn-chef/learn_chef_apache2.git
 knife cookbook upload vault_chef_approle_demo
 

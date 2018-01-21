@@ -1,0 +1,12 @@
+{
+    "rules": {
+        "path": {
+            "auth/approle/role/app-1/role-id/": {
+                "policy": "read"
+            },
+            "auth/token/create/": {
+                "policy": "update"
+            }
+        }
+    }
+}
