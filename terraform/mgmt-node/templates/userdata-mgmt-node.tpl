@@ -240,8 +240,7 @@ sudo systemctl start vault
 ##--------------------------------------------------------------------
 ## Vault Init, Configure Policies & Backends
 
-cd /home/ubuntu
-git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
+
 
 ##--------------------------------------------------------------------
 ## Install Chef Server & Chef DK
@@ -269,6 +268,8 @@ sudo chef-manage-ctl reconfigure --accept-license
 # Create our demo working directory, and setup for use with Chef/Knife
 # TODO: refactor for RHEL/CentOS
 cd /home/ubuntu
+chef gem install vault
+git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
 chef generate app $${CHEF_DEMO_APP_NAME}
 mkdir -p /home/ubuntu/$${CHEF_DEMO_APP_NAME}/.chef
 cp /tmp/*.pem /home/ubuntu/$${CHEF_DEMO_APP_NAME}/.chef

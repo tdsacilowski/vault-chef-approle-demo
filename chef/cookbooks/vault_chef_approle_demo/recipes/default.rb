@@ -4,18 +4,34 @@
 #
 # Copyright:: 2018, The Authors, All Rights Reserved.
 
-apt_update 'Update the apt cache daily' do
-    frequency 86_400
-    action :periodic
-  end
-  
-  package 'nginx'
-  
-  service 'nginx' do
-    supports status: true
-    action [:enable, :start]
-  end
-  
-  template '/var/www/html/index.html' do # ~FC033
-    source 'index.html.erb'
-  end
+chef_gem 'vault' 
+require 'vault'
+
+execute "apt-get update" do
+  command "apt-get update"
+end
+
+package 'nginx' do
+  action :install
+end
+
+service 'nginx' do
+  action [ :enable, :start ]
+end
+
+#
+# Display Vault Values
+#
+
+Vault.address = "http://34.207.91.208:8200"
+Vault.token   = "ccfb5ceb-8670-8005-5c4f-2ff3666be65d"
+
+template '/var/www/html/index.html' do
+  source 'index.html.erb'
+  variables lazy {
+    {
+      roleid: ENV['APPROLE_ROLEID'],
+      secretid: Vault.logical.read("auth/approle/role/app-1/secret-id")
+    }
+  }
+end

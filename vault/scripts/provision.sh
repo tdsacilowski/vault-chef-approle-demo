@@ -2,7 +2,12 @@
 set -x
 
 # Initialize Vault
-vault init -stored-shares=1 -recovery-shares=1 -recovery-threshold=1 -key-shares=1 -key-threshold=1
+curl \
+    --request PUT \
+    --data @/home/ubuntu/vault-chef-approle-demo/vault/config/init.json \
+    $VAULT_ADDR/v1/sys/init > init-response.json
+
+export VAULT_TOKEN=$(cat init-response.json | jq -r .root_token)
 
 # AppRole policy
 tee te-policy-app-1.hcl <<EOF
