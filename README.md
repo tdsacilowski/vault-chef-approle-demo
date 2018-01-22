@@ -8,9 +8,9 @@ This project is a working implementation of the concepts discussed in the _"Secu
 
 This project contains the following assets:
 - Chef cookbook [`/chef`]: A sample cookbook with a recipe that installs Nginx and demonstrates Vault Ruby Gem functionality used to interact with Vault APIs.
-- Terraform configurations:
-    - [`/terraform/mgmt-node`]: Configuration to set up a management server running both Vault and Chef Server, for demo purposes.
-    - [`/terraform/chef-node`]: Configuration to set up a Chef node and bootstrap it with the Chef Server, passing in Vault's AppRole RoleID and the appropriate Chef run-list.
+- Terraform configurations [`/terraform`]:
+    - `/terraform/mgmt-node`: Configuration to set up a management server running both Vault and Chef Server, for demo purposes.
+    - `/terraform/chef-node`: Configuration to set up a Chef node and bootstrap it with the Chef Server, passing in Vault's AppRole RoleID and the appropriate Chef run-list.
 - Vault configuration [`/vault`]: Data used to configure the appropriate mounts and policies in Vault for this demo.
 
 References:
