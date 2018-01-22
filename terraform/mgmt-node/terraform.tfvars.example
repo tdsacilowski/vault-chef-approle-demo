@@ -1,0 +1,36 @@
+aws_region = "us-east-1"
+
+# All resources will be tagged with this
+environment_name = "vault-chef-approle-demo"
+
+# S3 bucket name with Vault enterprise binary
+s3_bucket_name = "my-s3-bucket-name"
+
+# Name of Vault enterprise binary zip file
+vault_zip_file = "vault-ent-binary.zip"
+
+instance_type = "m4.large"
+
+# VPC ID in which to create security group(s)
+vpc_id = ""
+
+# Subnet ID in which to install
+subnet_id = "subnet-7be57154"
+
+# SSH key name to access EC2 instances
+key_name = "teddy-hc-se-demos"
+
+//--------------------------------------------------------------------
+// Chef Server Vars
+
+chef_server_package_url = "https://packages.chef.io/files/stable/chef-server/12.17.15/ubuntu/16.04/chef-server-core_12.17.15-1_amd64.deb"
+
+chef_dk_package_url = "https://packages.chef.io/files/stable/chefdk/2.4.17/ubuntu/16.04/chefdk_2.4.17-1_amd64.deb"
+
+chef_admin = "demo-admin"
+
+chef_admin_password = "pick-a-password"
+
+chef_org = "demo-org"
+
+chef_app_name = "chef-demo-app"

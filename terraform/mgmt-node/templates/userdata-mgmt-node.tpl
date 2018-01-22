@@ -268,13 +268,12 @@ sudo chef-manage-ctl reconfigure --accept-license
 # Create our demo working directory, and setup for use with Chef/Knife
 # TODO: refactor for RHEL/CentOS
 cd /home/ubuntu
-chef gem install vault
 git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
-chef generate app $${CHEF_DEMO_APP_NAME}
-mkdir -p /home/ubuntu/$${CHEF_DEMO_APP_NAME}/.chef
-cp /tmp/*.pem /home/ubuntu/$${CHEF_DEMO_APP_NAME}/.chef
+cd /home/ubuntu/vault-chef-approle-demo/chef/
+mkdir -p /home/ubuntu/vault-chef-approle-demo/chef/.chef
+cp /tmp/*.pem /home/ubuntu/vault-chef-approle-demo/chef/.chef
 
-tee /home/ubuntu/$${CHEF_DEMO_APP_NAME}/.chef/knife.rb <<EOF
+tee /home/ubuntu/vault-chef-approle-demo/chef/.chef/knife.rb <<EOF
 current_dir = File.dirname(__FILE__)
 log_level                :info
 log_location             STDOUT
@@ -288,14 +287,11 @@ cache_options( :path => "#{ENV['HOME']}/.chef/checksums" )
 cookbook_path            ["#{current_dir}/../cookbooks"]
 EOF
 
-cd /home/ubuntu/$${CHEF_DEMO_APP_NAME}
+cd /home/ubuntu/vault-chef-approle-demo/chef/
 knife ssl fetch
 knife ssl check
 
-# Clone demo cookbook
-cd /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks
-cp -R /home/ubuntu/vault-chef-approle-demo/chef/cookbooks/* /home/ubuntu/$${CHEF_DEMO_APP_NAME}/cookbooks/
-#git clone https://github.com/learn-chef/learn_chef_apache2.git
+cd /home/ubuntu/vault-chef-approle-demo/chef/cookbooks
 knife cookbook upload vault_chef_approle_demo
 
 chown -R ubuntu:ubuntu /home/ubuntu
