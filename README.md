@@ -20,7 +20,7 @@ Provisioning for this project happens in 2 phases:
 1. Vault + Chef Server
 2. Chef node (target system to which RoleID and SecretID are delivered)
 
-### Phase 1: Vault + Chef Server (`terraform/mgmt-node`)
+### Phase 1: Vault + Chef Server (`/terraform/mgmt-node`)
 
 This provides a quick and simple Vault and Chef Server configuration to help you get started.
 - In other words, this demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**
