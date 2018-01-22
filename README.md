@@ -25,14 +25,14 @@ Provisioning for this project happens in 2 phases:
 This provides a quick and simple Vault and Chef Server configuration to help you get started.
 - In other words, this demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**
 
-In this phase, we use Terraform to spin up a server with both Vault and Chef Server installed. Once this server is up and running, we'll complete the appropriate configuration steps in Vault and get our Chef admin key that will be used to bootstrap our Chef node (phase 2).
+In this phase, we use Terraform to spin up a server (and associated AWS resources) with both Vault and Chef Server installed. Once this server is up and running, we'll complete the appropriate configuration steps in Vault and get our Chef admin key that will be used to bootstrap our Chef node (phase 2).
 
 1. `cd` into the `/terraform/mgmt-node` directory
 2. Make sure to update the `terraform.tfvars.example` file accordingly and rename to `terraform.tfvars`.
     - ___NOTE:___ this project assumes that a Vault Enterprise binary is being used so that we can take advantage of AWS KMS auto unseal functionality. To use the Open Source version of Vault, modify your `terraform.tfvars` and `/terraform/mgmt-node/templates/userdata-mgmt-node.tpl` files accordingly.
     - The Terraform output will display the public IP address to SSH into your server.
     - TODO: add the ability to switch between Enterprise and Open Source versions.
-3. Once you can access your Vault + Chef server, you'll see that we performed a `git clone` of this repository, to pull down the appropriate Chef cookbook(s) and Vault configurations:
+3. Once you can access your Vault + Chef server, run `tail -f /var/log/tf-user-data.log` to see when the initial configuration is complete. This might take several minutes since we're setting everything up from scratch. Once done, you'll see that we performed a `git clone` of this repository in order to pull down the appropriate Chef cookbook(s) and Vault configurations:
     - `/home/ubuntu/vault-chef-approle-demo`: root of our Git repo.
     - `/home/ubuntu/vault-chef-approle-demo/chef`: root of our Chef app. This is where our `knife` configuration is located (`.chef/knife.rb`).
     - `/home/ubuntu/vault-chef-approle-demo/vault`: root of our Vault configurations. There's a `scripts/provision.sh` script to automate the provisioning, or you can follow along in the guide (linked above) to configure Vault manually.
