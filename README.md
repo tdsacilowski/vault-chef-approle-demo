@@ -14,6 +14,7 @@ This project contains the following assets:
 - Vault configuration [`/vault`]: Data used to configure the appropriate mounts and policies in Vault for this demo.
 
 References:
+- [Jeff Mitchell: Managing Secrets in a Container Environment](https://www.youtube.com/watch?v=skENC9aXgco)
 - [Seth Vargo: Using HashiCorp's Vault with Chef](https://www.hashicorp.com/blog/using-hashicorps-vault-with-chef)
 - [Seth Vargo & JJ Asghar: Manage Secrets with Chef and HashiCorps Vault](https://blog.chef.io/2016/12/12/manage-secrets-with-chef-and-hashicorps-vault/)
     - [Associated Github repo](https://github.com/sethvargo/vault-chef-webinar)
