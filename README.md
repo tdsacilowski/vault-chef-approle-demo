@@ -4,6 +4,8 @@ Work in progress...
 
 This project is a working implementation of the concepts discussed in the _"Secure Introduction with Vault: AppRole + Chef" (link TBD)_ Guide/Blogpost. It aims to provide an end-to-end example of how to use Vault's [AppRole authentication backend](https://www.vaultproject.io/docs/auth/approle.html), along with Terraform & Chef, to address the challenge of _secure introduction_ of an initial token to a target server/application.
 
+This demo is NOT SUITABLE FOR PRODUCTION USE!!
+
 This project contains the following assets:
 - Chef cookbook [`/chef`]: A sample cookbook with a recipe that installs Nginx and demonstrates Vault Ruby Gem functionality used to interact with Vault APIs.
 - Terraform configurations:
@@ -20,8 +22,8 @@ Provisioning for this project happens in 2 phases:
 
 ### Phase 1: Vault + Chef Server
 
-This provides a quick and simple configuration to help you get started.
-- In other words, this demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**.
+This provides a quick and simple Vault and Chef Server configuration to help you get started.
+- In other words, this demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**
 
 In this phase, we use Terraform to spin up a server with both Vault and Chef Server installed. Once this server is up and running, we'll complete the appropriate configuration steps in Vault and get our Chef admin key that will be used to bootstrap our Chef node (phase 2).
 
