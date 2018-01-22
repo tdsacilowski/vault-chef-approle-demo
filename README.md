@@ -13,6 +13,13 @@ This project contains the following assets:
     - [`/terraform/chef-node`]: Configuration to set up a Chef node and bootstrap it with the Chef Server, passing in Vault's AppRole RoleID and the appropriate Chef run-list.
 - Vault configuration [`/vault`]: Data used to configure the appropriate mounts and policies in Vault for this demo.
 
+References:
+- https://github.com/hashicorp-guides/vault-approle-chef (will eventually be merged with this repo)
+- [Using HashiCorp's Vault with Chef](https://www.hashicorp.com/blog/using-hashicorps-vault-with-chef)
+- [Vault Ruby Client](https://github.com/hashicorp/vault-ruby)
+- [Manage Secrets with Chef and HashiCorps Vault](https://blog.chef.io/2016/12/12/manage-secrets-with-chef-and-hashicorps-vault/)
+    - [Associated Github repo](https://github.com/sethvargo/vault-chef-webinar)
+
 ## Provisioning Steps
 
 Provisioning for this project happens in 2 phases:
@@ -37,7 +44,7 @@ Using Terraform Open Source:
     - **_TODO:_** add the ability to switch between Enterprise and Open Source versions.
 3. Perform a `terraform plan` to verify your changes and the resources that will be created. If all looks good, then perform a `terraform apply` to provision the resources.
     - The Terraform output will display the public IP address to SSH into your server.
-3. Once you can access your Vault + Chef server, run `tail -f /var/log/tf-user-data.log` to see when the initial configuration is complete. This might take several minutes since we're setting everything up from scratch. Once done, you'll see that we performed a `git clone` of this repository in order to pull down the appropriate Chef cookbook(s) and Vault configurations:
+4. Once you can access your Vault + Chef server, run `tail -f /var/log/tf-user-data.log` to see when the initial configuration is complete. This might take several minutes since we're setting everything up from scratch. Once done, you'll see that we performed a `git clone` of this repository in order to pull down the appropriate Chef cookbook(s) and Vault configurations:
     - `/home/ubuntu/vault-chef-approle-demo`: root of our Git repo.
     - `/home/ubuntu/vault-chef-approle-demo/chef`: root of our Chef app. This is where our `knife` configuration is located (`.chef/knife.rb`).
     - `/home/ubuntu/vault-chef-approle-demo/vault`: root of our Vault configurations. There's a `scripts/provision.sh` script to automate the provisioning, or you can follow along in the guide (linked above) to configure Vault manually.
