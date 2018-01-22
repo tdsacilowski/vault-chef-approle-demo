@@ -30,7 +30,7 @@ Provisioning for this project happens in 2 phases:
 1. Vault + Chef Server
 2. Chef node (target system to which RoleID and SecretID are delivered)
 
-### Phase 1: Vault + Chef Server (`/terraform/mgmt-node`)
+### Phase 1: Vault + Chef Server [`/terraform/mgmt-node`]
 
 This provides a quick and simple Vault and Chef Server configuration to help you get started.
 - In other words, this demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**
@@ -49,7 +49,7 @@ Using Terraform Open Source:
     - The Terraform output will display the public IP address to SSH into your server.
 4. Once you can access your Vault + Chef server, run `tail -f /var/log/tf-user-data.log` to see when the initial configuration is complete. This might take several minutes since we're setting everything up from scratch. Once done, you'll see that we performed a `git clone` of this repository in order to pull down the appropriate Chef cookbook(s) and Vault configurations:
     - `/home/ubuntu/vault-chef-approle-demo`: root of our Git repo.
-    - `/home/ubuntu/vault-chef-approle-demo/chef`: root of our Chef app. This is where our `knife` configuration is located (`.chef/knife.rb`).
+    - `/home/ubuntu/vault-chef-approle-demo/chef`: root of our Chef app. This is where our `knife` configuration is located [`.chef/knife.rb`].
     - `/home/ubuntu/vault-chef-approle-demo/vault`: root of our Vault configurations. There's a `scripts/provision.sh` script to automate the provisioning, or you can follow along in the guide (linked above) to configure Vault manually.
 
 Work in progress...
