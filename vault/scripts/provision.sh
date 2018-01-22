@@ -28,7 +28,7 @@ vault write auth/approle/role/app-1 \
     token_num_uses=10 \
     token_ttl=20m \
     token_max_ttl=30m \
-    secret_id_num_uses=1 \
+    secret_id_num_uses=10 \
     policies=te-policy-app-1
 
 # Policy to retrieve Secret ID for AppRole

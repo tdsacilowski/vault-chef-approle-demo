@@ -7,4 +7,4 @@ sudo curl --silent -Lo /bin/jq https://github.com/stedolan/jq/releases/download/
 sudo chmod +x /bin/jq
 
 # Write AppRole RoleID
-echo "export APPROLE_ROLEID=$(echo '${tpl_role_id}' | jq -r .role_id)" > /etc/profile.d/approle-roleid.sh
+echo "export APPROLE_ROLEID=$(echo '${tpl_role_id}' | jq -r .role_id)" >> /etc/environment
