@@ -2,9 +2,9 @@ Work in progress...
 
 # Vault AppRole Example(s)
 
-This project is a working implementation of the concepts discussed in the _"Secure Introduction with Vault: AppRole + Chef" (link TBD)_ Guide/Blogpost. It aims to provide an end-to-end example of how to use Vault's [AppRole authentication backend](https://www.vaultproject.io/docs/auth/approle.html), along with Terraform & Chef, to address the challenge of _secure introduction_ of an initial token to a target server/application.
+This demo is **_NOT SUITABLE FOR PRODUCTION USE!!_**
 
-This demo is NOT SUITABLE FOR PRODUCTION USE!!
+This project is a working implementation of the concepts discussed in the _"Secure Introduction with Vault: AppRole + Chef" (link TBD)_ Guide/Blogpost. It aims to provide an end-to-end example of how to use Vault's [AppRole authentication backend](https://www.vaultproject.io/docs/auth/approle.html), along with Terraform & Chef, to address the challenge of _secure introduction_ of an initial token to a target server/application.
 
 This project contains the following assets:
 - Chef cookbook [`/chef`]: A sample cookbook with a recipe that installs Nginx and demonstrates Vault Ruby Gem functionality used to interact with Vault APIs.
