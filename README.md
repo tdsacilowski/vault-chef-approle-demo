@@ -14,11 +14,13 @@ This project contains the following assets:
 - Vault configuration [`/vault`]: Data used to configure the appropriate mounts and policies in Vault for this demo.
 
 References:
-- https://github.com/hashicorp-guides/vault-approle-chef (will eventually be merged with this repo)
-- [Using HashiCorp's Vault with Chef](https://www.hashicorp.com/blog/using-hashicorps-vault-with-chef)
-- [Vault Ruby Client](https://github.com/hashicorp/vault-ruby)
-- [Manage Secrets with Chef and HashiCorps Vault](https://blog.chef.io/2016/12/12/manage-secrets-with-chef-and-hashicorps-vault/)
+- [Seth Vargo: Using HashiCorp's Vault with Chef](https://www.hashicorp.com/blog/using-hashicorps-vault-with-chef)
+- [Seth Vargo & JJ Asghar: Manage Secrets with Chef and HashiCorps Vault](https://blog.chef.io/2016/12/12/manage-secrets-with-chef-and-hashicorps-vault/)
     - [Associated Github repo](https://github.com/sethvargo/vault-chef-webinar)
+- [Alan Thatcher: Vault AppRole Authentication](http://blog.alanthatcher.io/vault-approle-authentication/)
+- [Alan Thatcher: Integrating Chef and HashiCorp Vault](http://blog.alanthatcher.io/integrating-chef-and-hashicorp-vault/)
+- [Vault Ruby Client](https://github.com/hashicorp/vault-ruby)
+- https://github.com/hashicorp-guides/vault-approle-chef (will eventually be merged with this repo)
 
 ## Provisioning Steps
 
@@ -34,7 +36,7 @@ This provides a quick and simple Vault and Chef Server configuration to help you
 
 In this phase, we use Terraform to spin up a server (and associated AWS resources) with both Vault and Chef Server installed. Once this server is up and running, we'll complete the appropriate configuration steps in Vault and get our Chef admin key that will be used to bootstrap our Chef node (phase 2).
 
-_If using [Terraform Enterprise](https://www.terraform.io/docs/enterprise/getting-started/index.html), create a Workspace for this repo and set the appropriate Terraform/Environment variables using the `terraform.tfvars.example` file as a reference. Follow the instructions linked above to perform the appropriate setup in Terraform Enterprise._
+_If using [Terraform Enterprise](https://www.terraform.io/docs/enterprise/getting-started/index.html), create a Workspace for this repo and set the appropriate Terraform/Environment variables using the `terraform.tfvars.example` file as a reference. Follow the instructions in the documentation linked above to perform the appropriate setup in Terraform Enterprise._
 
 Using Terraform Open Source:
 
