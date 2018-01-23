@@ -238,11 +238,6 @@ sudo systemctl enable vault
 sudo systemctl start vault
 
 ##--------------------------------------------------------------------
-## Vault Init, Configure Policies & Backends
-
-
-
-##--------------------------------------------------------------------
 ## Install Chef Server & Chef DK
 
 # Download Chef packages
@@ -260,21 +255,33 @@ sudo chef-server-ctl reconfigure
 sudo chef-server-ctl user-create $${CHEF_ADMIN} demo admin $${CHEF_ADMIN}@example.com $${CHEF_ADMIN_PASSWORD} --filename /tmp/$${CHEF_ADMIN_PEM}
 sudo chef-server-ctl org-create $${CHEF_DEMO_ORG} 'Demo Organization' --association_user $${CHEF_ADMIN} --filename /tmp/$${CHEF_DEMO_PEM}
 
+# Copy user key to S3 for use by Terraform to bootstrap our Chef node
+aws s3 cp /tmp/$${CHEF_ADMIN_PEM} s3://$${S3_BUCKET}/$${CHEF_ADMIN_PEM}
+
 # Install Chef Manage and reconfgigure/restart services
 sudo chef-server-ctl install chef-manage
 sudo chef-server-ctl reconfigure
 sudo chef-manage-ctl reconfigure --accept-license
 
-# Create our demo working directory, and setup for use with Chef/Knife
-# TODO: refactor for RHEL/CentOS
+##--------------------------------------------------------------------
+## Clone the Project Git Repo
+
 cd /home/ubuntu
 git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
+
+##--------------------------------------------------------------------
+## Vault Init, Configure Policies & Backends
+
+cd /home/ubuntu/vault-chef-approle-demo/vault/
+chmod +x scripts/provision.sh
+/home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
+
+##--------------------------------------------------------------------
+## Finish Chef App Config, Knife Config, Etc
+
 cd /home/ubuntu/vault-chef-approle-demo/chef/
 mkdir -p /home/ubuntu/vault-chef-approle-demo/chef/.chef
 cp /tmp/*.pem /home/ubuntu/vault-chef-approle-demo/chef/.chef
-
-# Copy user key to S3 for use by Terraform to bootstrap our Chef node
-aws s3 cp /tmp/$${CHEF_ADMIN_PEM} s3://$${S3_BUCKET}/$${CHEF_ADMIN_PEM}
 
 tee /home/ubuntu/vault-chef-approle-demo/chef/.chef/knife.rb <<EOF
 current_dir = File.dirname(__FILE__)
@@ -296,6 +303,14 @@ knife ssl check
 
 cd /home/ubuntu/vault-chef-approle-demo/chef/cookbooks
 knife cookbook upload vault_chef_approle_demo
+
+cd /home/ubuntu/vault-chef-approle-demo/chef/
+cat /home/ubuntu/vault-chef-approle-demo/vault/secretid_token.json | jq --arg id approle_secretid_token '. + {id: $id}' > secretid_token.json
+knife data bag create secretid_token
+knife data bag from file secretid_token secretid_token.json
+knife data bag list
+knife data bag show secretid_token
+knife data bag show secretid_token approle_secretid_token
 
 chown -R ubuntu:ubuntu /home/ubuntu
 
