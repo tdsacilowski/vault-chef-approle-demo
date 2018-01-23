@@ -1,65 +1,211 @@
 #!/usr/bin/env bash
 set -x
 
+##--------------------------------------------------------------------
+## Initialize Vault
+
+# Initialization payload
+tee init.json <<EOF
+{
+    "secret_shares": 1,
+    "secret_threshold": 1,
+    "stored_shares": 1,
+    "recovery_shares": 1,
+    "recovery_threshold": 1,
+    "key_shares": 1,
+    "key_threshold": 1
+}
+EOF
+
 # Initialize Vault
 curl \
     --request PUT \
-    --data @/home/ubuntu/vault-chef-approle-demo/vault/config/init.json \
+    --data @init.json \
     $VAULT_ADDR/v1/sys/init > init-response.json
 
 export VAULT_TOKEN=$(cat init-response.json | jq -r .root_token)
 
-# AppRole policy
-tee te-policy-app-1.hcl <<EOF
-path "secret/app-1/*" {
-  capabilities = ["create", "read", "update", "delete", "list"]
+##--------------------------------------------------------------------
+## Configure Audit Backend
+
+mkdir /home/ubuntu/vault-logs/
+sudo chown vault:vault /home/ubuntu/vault-logs/
+
+tee audit-backend-file.json <<EOF
+{
+  "type": "file",
+  "options": {
+    "path": "/home/ubuntu/vault-logs/vault-log.txt"
+  }
 }
 EOF
 
-# Write policy
-vault write sys/policy/te-policy-app-1 policy=@te-policy-app-1.hcl
+curl \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request PUT \
+    --data @audit-backend-file.json \
+    $VAULT_ADDR/v1/sys/audit/file-audit
 
-# Enable AppRole auth backend
-vault auth-enable approle
+sudo chmod -R 0777 /home/ubuntu/vault-logs/
 
-# Create AppRole role and associate policy
-vault write auth/approle/role/app-1 \
-    secret_id_ttl=10m \
-    token_num_uses=10 \
-    token_ttl=20m \
-    token_max_ttl=30m \
-    secret_id_num_uses=10 \
-    policies=te-policy-app-1
+##--------------------------------------------------------------------
+## Create ACL Policies
 
-# Policy to retrieve Secret ID for AppRole
-tee te-policy-app-1-secretID.hcl <<EOF
-path "auth/approle/role/app-1/secret-id" {
-    capabilities = ["update"]
-}
+# Policy to apply to AppRole token
+tee app-1-secret-kv.json <<EOF
+{"policy":"path \"secret/app-1/*\" {capabilities = [\"create\", \"read\", \"update\", \"delete\", \"list\"]}"}
 EOF
 
-# Write policy
-vault write sys/policy/te-policy-app-1-secretID \
-    policy=@te-policy-app-1-secretID.hcl
+# Write the policy
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request PUT \
+    --data @app-1-secret-kv.json \
+    $VAULT_ADDR/v1/sys/policy/app-1-secret-kv
 
-# Policy to retrieve Role ID for AppRole
-tee te-policy-app-1-roleID.hcl <<EOF
-path "auth/approle/role/app-1/role-id" {
-    capabilities = ["read"]
-}
+# Policy to get RoleID
+tee app-1-auth-approle-roleid.json <<EOF
+{"policy":"path \"auth/approle/role/app-1/role-id\" {capabilities = [\"read\"]}"}
+EOF
+
+# Write the policy
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request PUT \
+    --data @app-1-auth-approle-roleid.json \
+    $VAULT_ADDR/v1/sys/policy/app-1-auth-approle-roleid
+
+# Policy to get SecretID
+tee app-1-auth-approle-secretid.json <<EOF
+{"policy":"path \"auth/approle/role/app-1/secret-id\" {capabilities = [\"update\"]}"}
+EOF
+
+# Write the policy
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request PUT \
+    --data @app-1-auth-approle-secretid.json \
+    $VAULT_ADDR/v1/sys/policy/app-1-auth-approle-secretid
+
 # For Terraform
 # See: https://www.terraform.io/docs/providers/vault/index.html#token
-path "/auth/token/create" {
-    capabilities = ["update"]
+tee terraform-create-child-token.json <<EOF
+{"policy":"path \"/auth/token/create\" {capabilities = [\"update\"]}"}
+EOF
+
+# Write the policy
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request PUT \
+    --data @terraform-create-child-token.json \
+    $VAULT_ADDR/v1/sys/policy/terraform-create-child-token
+
+# List ACL policies
+curl \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request LIST \
+    $VAULT_ADDR/v1/sys/policy | jq
+
+##--------------------------------------------------------------------
+## Enable & Configure AppRole Auth Backend
+
+# AppRole auth backend config
+tee approle.json <<EOF
+{
+  "type": "approle",
+  "description": "Demo AppRole auth backend"
 }
 EOF
 
-# Write policy
-vault write sys/policy/te-policy-app-1-roleID \
-    policy=@te-policy-app-1-roleID.hcl
+# Create the backend
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @approle.json \
+    $VAULT_ADDR/v1/sys/auth/approle
 
-# Token to retrieve Secret IDs
-vault token-create -policy="te-policy-app-1-secretID"
+# AppRole backend configuration
+tee app-1-approle-role.json <<EOF
+{
+    "role_name": "app-1",
+    "bind_secret_id": true,
+    "secret_id_ttl": "10m",
+    "secret_id_num_uses": "1",
+    "token_ttl": "10m",
+    "token_max_ttl": "30m",
+    "period": 0,
+    "policies": [
+        "app-1-secret-kv"
+    ]
+}
+EOF
 
-# Token to retrieve Role IDs
-vault token-create -policy="te-policy-app-1-roleID"
+# Create the AppRole role
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @app-1-approle-role.json \
+    $VAULT_ADDR/v1/auth/approle/role/app-1
+
+# Configure token for RoleID
+tee token-roleid.json <<EOF
+{
+  "policies": [
+    "app-1-auth-approle-roleid",
+    "terraform-create-child-token"
+  ],
+  "metadata": {
+    "user": "chef-demo"
+  },
+  "ttl": "720h",
+  "renewable": true
+}
+EOF
+
+# Get token
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @token-roleid.json \
+    $VAULT_ADDR/v1/auth/token/create > roleid-token.json
+
+# Configure token for SecretID
+tee token-secretid.json <<EOF
+{
+  "policies": [
+    "app-1-auth-approle-secretid"
+  ],
+  "metadata": {
+    "user": "chef-demo"
+  },
+  "ttl": "720h",
+  "renewable": true
+}
+EOF
+
+# Get token
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @token-secretid.json \
+    $VAULT_ADDR/v1/auth/token/create > secretid-token.json
+
+cat roleid-token.json | jq -r .auth.client_token
+cat secretid-token.json | jq -r .auth.client_token

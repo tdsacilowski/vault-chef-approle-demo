@@ -149,9 +149,16 @@ data "aws_iam_policy_document" "vault" {
   }
 
   statement {
-    sid     = "S3GetObject"
-    effect  = "Allow"
-    actions = ["s3:GetObject"]
+    sid    = "S3GetObject"
+    effect = "Allow"
+
+    actions = [
+      "s3:PutObject",
+      "s3:PutObjectAcl",
+      "s3:GetObject",
+      "s3:GetObjectAcl",
+      "s3:DeleteObject",
+    ]
 
     resources = [
       "arn:aws:s3:::${var.s3_bucket_name}",

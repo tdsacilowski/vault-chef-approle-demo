@@ -186,7 +186,7 @@ EOF
 sudo chown -R vault:vault /etc/vault.d /etc/ssl/vault /opt/vault
 sudo chmod -R 0644 /etc/vault.d/*
 
-sudo tee -a /etc/profile.d/vault.sh <<EOF
+sudo tee -a /etc/environment <<EOF
 export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_SKIP_VERIFY=true
 EOF
@@ -272,6 +272,9 @@ git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
 cd /home/ubuntu/vault-chef-approle-demo/chef/
 mkdir -p /home/ubuntu/vault-chef-approle-demo/chef/.chef
 cp /tmp/*.pem /home/ubuntu/vault-chef-approle-demo/chef/.chef
+
+# Copy user key to S3 for use by Terraform to bootstrap our Chef node
+aws s3 cp /tmp/$${CHEF_ADMIN_PEM} s3://$${S3_BUCKET}/$${CHEF_ADMIN_PEM}
 
 tee /home/ubuntu/vault-chef-approle-demo/chef/.chef/knife.rb <<EOF
 current_dir = File.dirname(__FILE__)

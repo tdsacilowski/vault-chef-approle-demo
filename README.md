@@ -51,5 +51,6 @@ Using Terraform Open Source:
     - `/home/ubuntu/vault-chef-approle-demo`: root of our Git repo.
     - `/home/ubuntu/vault-chef-approle-demo/chef`: root of our Chef app. This is where our `knife` configuration is located [`.chef/knife.rb`].
     - `/home/ubuntu/vault-chef-approle-demo/vault`: root of our Vault configurations. There's a `scripts/provision.sh` script to automate the provisioning, or you can follow along in the guide (linked above) to configure Vault manually.
+5. Perform initial Vault configuration: `cd` to `/home/ubuntu/vault-chef-approle-demo/vault/scripts` and run the `provision.sh` script.
 
 Work in progress...
