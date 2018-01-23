@@ -270,13 +270,6 @@ cd /home/ubuntu
 git clone https://github.com/tdsacilowski/vault-chef-approle-demo.git
 
 ##--------------------------------------------------------------------
-## Vault Init, Configure Policies & Backends
-
-cd /home/ubuntu/vault-chef-approle-demo/vault/
-chmod +x scripts/provision.sh
-/home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
-
-##--------------------------------------------------------------------
 ## Finish Chef App Config, Knife Config, Etc
 
 cd /home/ubuntu/vault-chef-approle-demo/chef/
@@ -304,13 +297,22 @@ knife ssl check
 cd /home/ubuntu/vault-chef-approle-demo/chef/cookbooks
 knife cookbook upload vault_chef_approle_demo
 
-cd /home/ubuntu/vault-chef-approle-demo/chef/
-cat /home/ubuntu/vault-chef-approle-demo/vault/secretid_token.json | jq --arg id approle_secretid_token '. + {id: $id}' > secretid_token.json
-knife data bag create secretid_token
-knife data bag from file secretid_token secretid_token.json
-knife data bag list
-knife data bag show secretid_token
-knife data bag show secretid_token approle_secretid_token
+##--------------------------------------------------------------------
+## Vault Init, Configure Policies & Backends, and Create Chef Databag
+
+# Uncomment below for automated setuo
+
+# cd /home/ubuntu/vault-chef-approle-demo/vault/
+# chmod +x scripts/provision.sh
+# /home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
+
+# cd /home/ubuntu/vault-chef-approle-demo/chef/
+# cat /home/ubuntu/vault-chef-approle-demo/vault/secretid_token.json | jq --arg id approle_secretid_token '. + {id: $id}' > secretid_token.json
+# knife data bag create secretid_token
+# knife data bag from file secretid_token secretid_token.json
+# knife data bag list
+# knife data bag show secretid_token
+# knife data bag show secretid_token approle_secretid_token
 
 chown -R ubuntu:ubuntu /home/ubuntu
 
