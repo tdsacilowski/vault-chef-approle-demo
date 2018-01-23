@@ -8,3 +8,6 @@ sudo chmod +x /bin/jq
 
 # Write AppRole RoleID
 echo "export APPROLE_ROLEID=$(echo '${tpl_role_id}' | jq -r .role_id)" >> /etc/environment
+
+# Write Vault address
+echo "export VAULT_ADDR=${tpl_vault_addr}" >> /etc/environment

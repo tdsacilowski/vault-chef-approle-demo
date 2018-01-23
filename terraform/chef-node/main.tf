@@ -36,7 +36,7 @@ resource "aws_instance" "chef-node" {
     node_name               = "chef-node-test"
     server_url              = "${var.chef_server_address}"
     user_name               = "demo-admin"
-    user_key                = "${var.chef_pem}"
+    user_key                = "${data.aws_s3_bucket_object.chef_bootstrap_pem.body}"
     run_list                = ["recipe[vault_chef_approle_demo]"]
     recreate_client         = true
     fetch_chef_certificates = true
@@ -92,6 +92,11 @@ data "vault_generic_secret" "approle" {
   path = "auth/approle/role/app-1/role-id"
 }
 
+data "aws_s3_bucket_object" "chef_bootstrap_pem" {
+  bucket = "teddy-hc-se-demos"
+  key    = "demo-admin-private-key.pem"
+}
+
 data "aws_ami" "ubuntu" {
   most_recent = true
 
@@ -112,6 +117,7 @@ data "template_file" "role-id" {
   template = "${file("${path.module}/templates/userdata-chef-node.tpl")}"
 
   vars = {
-    tpl_role_id = "${data.vault_generic_secret.approle.data_json}"
+    tpl_role_id    = "${data.vault_generic_secret.approle.data_json}"
+    tpl_vault_addr = "${var.vault_address}"
   }
 }

@@ -55,7 +55,7 @@ sudo chmod -R 0777 /home/ubuntu/vault-logs/
 ## Create ACL Policies
 
 # Policy to apply to AppRole token
-tee app_1_secret_read.json <<EOF
+tee app-1-secret-read.json <<EOF
 {"policy":"path \"secret/app-1/*\" {capabilities = [\"read\", \"list\"]}"}
 EOF
 
@@ -65,13 +65,13 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request PUT \
-    --data @app_1_secret_read \
-    $VAULT_ADDR/v1/sys/policy/app_1_secret_read
+    --data @app-1-secret-read \
+    $VAULT_ADDR/v1/sys/policy/app-1-secret-read
 
 ##--------------------------------------------------------------------
 
 # Policy to get RoleID
-tee app_1_approle_roleid_get.json <<EOF
+tee app-1-approle-roleid-get.json <<EOF
 {"policy":"path \"auth/approle/role/app-1/role-id\" {capabilities = [\"read\"]}"}
 EOF
 
@@ -81,13 +81,13 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request PUT \
-    --data @app_1_approle_roleid_get.json \
-    $VAULT_ADDR/v1/sys/policy/app_1_approle_roleid_get
+    --data @app-1-approle-roleid-get.json \
+    $VAULT_ADDR/v1/sys/policy/app-1-approle-roleid-get
 
 ##--------------------------------------------------------------------
 
 # Policy to get SecretID
-tee app_1_approle_secretid_create.json <<EOF
+tee app-1-approle-secretid-create.json <<EOF
 {"policy":"path \"auth/approle/role/app-1/secret-id\" {capabilities = [\"update\"]}"}
 EOF
 
@@ -97,14 +97,14 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request PUT \
-    --data @app_1_approle_secretid_create.json \
-    $VAULT_ADDR/v1/sys/policy/app_1_approle_secretid_create
+    --data @app-1-approle-secretid-create.json \
+    $VAULT_ADDR/v1/sys/policy/app-1-approle-secretid-create
 
 ##--------------------------------------------------------------------
 
 # For Terraform
 # See: https://www.terraform.io/docs/providers/vault/index.html#token
-tee terraform_token_create.json <<EOF
+tee terraform-token-create.json <<EOF
 {"policy":"path \"/auth/token/create\" {capabilities = [\"update\"]}"}
 EOF
 
@@ -114,8 +114,8 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request PUT \
-    --data @terraform_token_create.json \
-    $VAULT_ADDR/v1/sys/policy/terraform_token_create
+    --data @terraform-token-create.json \
+    $VAULT_ADDR/v1/sys/policy/terraform-token-create
 
 ##--------------------------------------------------------------------
 
@@ -147,9 +147,9 @@ curl \
     $VAULT_ADDR/v1/sys/auth/approle
 
 # AppRole backend configuration
-tee app_1_approle_role.json <<EOF
+tee app-1-approle-role.json <<EOF
 {
-    "role_name": "app_1",
+    "role_name": "app-1",
     "bind_secret_id": true,
     "secret_id_ttl": "10m",
     "secret_id_num_uses": "1",
@@ -157,7 +157,7 @@ tee app_1_approle_role.json <<EOF
     "token_max_ttl": "30m",
     "period": 0,
     "policies": [
-        "app_1_secret_read"
+        "app-1-secret-read"
     ]
 }
 EOF
@@ -168,15 +168,15 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
-    --data @app_1_approle_role.json \
-    $VAULT_ADDR/v1/auth/approle/role/app_1
+    --data @app-1-approle-role.json \
+    $VAULT_ADDR/v1/auth/approle/role/app-1
 
 # Configure token for RoleID
-tee roleid_token_config.json <<EOF
+tee roleid-token-config.json <<EOF
 {
   "policies": [
-    "app_1_approle_roleid_get",
-    "terraform_token_create"
+    "app-1-approle-roleid-get",
+    "terraform-token-create"
   ],
   "metadata": {
     "user": "chef-demo"
@@ -192,14 +192,14 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
-    --data @roleid_token_config.json \
-    $VAULT_ADDR/v1/auth/token/create > roleid_token.json
+    --data @roleid-token-config.json \
+    $VAULT_ADDR/v1/auth/token/create > roleid-token.json
 
 # Configure token for SecretID
-tee secretid_token_config.json <<EOF
+tee secretid-token-config.json <<EOF
 {
   "policies": [
-    "app_1_approle_secretid_create"
+    "app-1-approle-secretid-create"
   ],
   "metadata": {
     "user": "chef-demo"
@@ -215,8 +215,8 @@ curl \
     --location \
     --header "X-Vault-Token: $VAULT_TOKEN" \
     --request POST \
-    --data @secretid_token_config.json \
-    $VAULT_ADDR/v1/auth/token/create > secretid_token.json
+    --data @secretid-token-config.json \
+    $VAULT_ADDR/v1/auth/token/create > secretid-token.json
 
-cat roleid_token.json | jq -r .auth.client_token
-cat secretid_token.json | jq -r .auth.client_token
+cat roleid-token.json | jq -r .auth.client_token
+cat secretid-token.json | jq -r .auth.client_token

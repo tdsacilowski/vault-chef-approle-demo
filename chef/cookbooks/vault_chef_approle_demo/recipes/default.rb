@@ -22,12 +22,16 @@ service 'nginx' do
   action [ :enable, :start ]
 end
 
+# Get SecretID retrieval token from data bag
+vault_token_data = data_bag_item('secretid-token', 'approle-secretid-token')
+var_vault_token = vault_token_data['auth']['client_token']
+
 #
 # Display Vault Values
 #
 
-Vault.address = "http://34.207.91.208:8200"
-Vault.token   = "ccfb5ceb-8670-8005-5c4f-2ff3666be65d"
+Vault.address = ENV['VAULT_ADDR']
+Vault.token   = var_vault_token
 
 var_role_id = ENV['APPROLE_ROLEID']
 var_secret_id = Vault.approle.create_secret_id('app-1').data[:secret_id]
