@@ -5,8 +5,17 @@ provider "aws" {
   region = "${var.aws_region}"
 }
 
+# These should typically be set via environment variables:
+# https://www.terraform.io/docs/providers/vault/index.html#provider-arguments
 provider "vault" {
   address = "${var.vault_address}"
+
+  # Token used to get AppRole RoleID
+  token = "${var.vault_token}"
+}
+
+data "vault_generic_secret" "approle" {
+  path = "auth/approle/role/app-1/role-id"
 }
 
 //--------------------------------------------------------------------
@@ -33,10 +42,12 @@ resource "aws_instance" "chef-node" {
       private_key = "${var.ec2_pem}"
     }
 
-    node_name               = "chef-node-test"
-    server_url              = "${var.chef_server_address}"
-    user_name               = "demo-admin"
-    user_key                = "${data.aws_s3_bucket_object.chef_bootstrap_pem.body}"
+    node_name  = "chef-node-test"
+    server_url = "${var.chef_server_address}"
+    user_name  = "demo-admin"
+    user_key   = "${data.aws_s3_bucket_object.chef_bootstrap_pem.body}"
+
+    #user_key                = "${var.chef_pem}"
     run_list                = ["recipe[vault_chef_approle_demo]"]
     recreate_client         = true
     fetch_chef_certificates = true
@@ -87,10 +98,6 @@ resource "aws_security_group" "chef-node" {
 
 //--------------------------------------------------------------------
 // Data Sources
-
-data "vault_generic_secret" "approle" {
-  path = "auth/approle/role/app-1/role-id"
-}
 
 data "aws_s3_bucket_object" "chef_bootstrap_pem" {
   bucket = "teddy-hc-se-demos"

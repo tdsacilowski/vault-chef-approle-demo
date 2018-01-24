@@ -56,7 +56,7 @@ sudo chmod -R 0777 /home/ubuntu/vault-logs/
 
 # Policy to apply to AppRole token
 tee app-1-secret-read.json <<EOF
-{"policy":"path \"secret/app-1/*\" {capabilities = [\"read\", \"list\"]}"}
+{"policy":"path \"secret/app-1\" {capabilities = [\"read\", \"list\"]}"}
 EOF
 
 # Write the policy
@@ -217,6 +217,22 @@ curl \
     --request POST \
     --data @secretid-token-config.json \
     $VAULT_ADDR/v1/auth/token/create > secretid-token.json
+
+# Write some demo secrets
+tee demo-secrets.json <<'EOF'
+{
+  "username": "app-1-user",
+  "password": "$up3r$3cr3t!"
+}
+EOF
+
+curl \
+    --silent \
+    --location \
+    --header "X-Vault-Token: $VAULT_TOKEN" \
+    --request POST \
+    --data @demo-secrets.json \
+    $VAULT_ADDR/v1/secret/app-1
 
 cat roleid-token.json | jq -r .auth.client_token
 cat secretid-token.json | jq -r .auth.client_token

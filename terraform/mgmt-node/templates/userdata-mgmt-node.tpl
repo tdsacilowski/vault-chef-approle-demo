@@ -302,19 +302,17 @@ knife cookbook upload vault_chef_approle_demo
 ##--------------------------------------------------------------------
 ## Vault Init, Configure Policies & Backends, and Create Chef Databag
 
-# Uncomment below for automated setuo
+cd /home/ubuntu/vault-chef-approle-demo/vault/
+chmod +x scripts/provision.sh
+/home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
 
-# cd /home/ubuntu/vault-chef-approle-demo/vault/
-# chmod +x scripts/provision.sh
-# /home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
-
-# cd /home/ubuntu/vault-chef-approle-demo/chef/
-# cat /home/ubuntu/vault-chef-approle-demo/vault/secretid-token.json | jq --arg id approle-secretid-token '. + {id: $id}' > secretid-token.json
-# knife data bag create secretid-token
-# knife data bag from file secretid-token secretid-token.json
-# knife data bag list
-# knife data bag show secretid-token
-# knife data bag show secretid-token approle-secretid-token
+cd /home/ubuntu/vault-chef-approle-demo/chef/
+cat /home/ubuntu/vault-chef-approle-demo/vault/secretid-token.json | jq --arg id approle-secretid-token '. + {id: $id}' > secretid-token.json
+knife data bag create secretid-token
+knife data bag from file secretid-token secretid-token.json
+knife data bag list
+knife data bag show secretid-token
+knife data bag show secretid-token approle-secretid-token
 
 chown -R ubuntu:ubuntu /home/ubuntu
 
