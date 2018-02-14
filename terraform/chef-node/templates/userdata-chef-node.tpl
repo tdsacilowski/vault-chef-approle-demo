@@ -11,3 +11,7 @@ echo "export APPROLE_ROLEID=$(echo '${tpl_role_id}' | jq -r .role_id)" >> /etc/e
 
 # Write Vault address
 echo "export VAULT_ADDR=${tpl_vault_addr}" >> /etc/environment
+
+# Signal when Terraform user_data is finished
+# https://github.com/hashicorp/terraform/issues/4668
+touch /tmp/signal

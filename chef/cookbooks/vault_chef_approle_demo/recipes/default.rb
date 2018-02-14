@@ -11,6 +11,14 @@ end
 
 require 'vault'
 
+# Wait for Terraform user_data to finish
+# https://github.com/hashicorp/terraform/issues/4668
+ruby_block 'wait for tomcat' do
+  block do
+    true until ::File.exists?('/tmp/signal')
+  end
+end
+
 # Install Nginx
 execute "apt-get update" do
   command "apt-get update"
@@ -24,19 +32,21 @@ service 'nginx' do
   action [ :enable, :start ]
 end
 
+# Configure address for Vault Gem
+Vault.address = ENV['VAULT_ADDR']
+
 # Get SecretID retrieval token from data bag
 vault_token_data = data_bag_item('secretid-token', 'approle-secretid-token')
 var_vault_token = vault_token_data['auth']['client_token']
 
-# Vault connection info
-Vault.address = ENV['VAULT_ADDR']
+# Configure token for Vault Gem (to retrieve SecretID)
 Vault.token   = var_vault_token
-
-# Get AppRole RoleID from ENV (delivered via Terraform)
-var_role_id = ENV['APPROLE_ROLEID']
 
 # Get AppRole SecretID from Vault
 var_secret_id = Vault.approle.create_secret_id('app-1').data[:secret_id]
+
+# Get AppRole RoleID from ENV (delivered via Terraform)
+var_role_id = ENV['APPROLE_ROLEID']
 
 # Bring RoleID and SecretID together for AppRole authentication
 secret = Vault.auth.approle( var_role_id, var_secret_id )

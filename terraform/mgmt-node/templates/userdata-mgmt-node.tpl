@@ -47,10 +47,6 @@ APT_GET=$(which apt-get 2>/dev/null)
 ##--------------------------------------------------------------------
 ## Install Base Prerequisites
 
-logger "Installing jq"
-sudo curl --silent -Lo /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-sudo chmod +x /bin/jq
-
 logger "Setting timezone to UTC"
 sudo timedatectl set-timezone UTC
 
@@ -61,14 +57,14 @@ if [[ ! -z $${YUM} ]]; then
   sudo yum-config-manager --enable rhui-REGION-rhel-server-supplementary
   sudo yum-config-manager --enable rhui-REGION-rhel-server-extras
   sudo yum -y check-update
-  sudo yum install -q -y wget unzip bind-utils ruby rubygems ntp
+  sudo yum install -q -y wget unzip bind-utils ruby rubygems ntp jq
   sudo systemctl start ntpd.service
   sudo systemctl enable ntpd.service
 elif [[ ! -z $${APT_GET} ]]; then
   logger "Debian/Ubuntu system detected"
   logger "Performing updates and installing prerequisites"
   sudo apt-get -qq -y update
-  sudo apt-get install -qq -y wget unzip dnsutils ruby rubygems ntp
+  sudo apt-get install -qq -y wget unzip dnsutils ruby rubygems ntp jq
   sudo systemctl start ntp.service
   sudo systemctl enable ntp.service
   logger "Disable reverse dns lookup in SSH"
@@ -191,7 +187,7 @@ export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_SKIP_VERIFY=true
 EOF
 
-source /etc/profile.d/vault.sh
+source /etc/environment
 
 logger "Granting mlock syscall to vault binary"
 sudo setcap cap_ipc_lock=+ep /usr/local/bin/vault
