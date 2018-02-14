@@ -13,7 +13,7 @@ require 'vault'
 
 # Wait for Terraform user_data to finish
 # https://github.com/hashicorp/terraform/issues/4668
-ruby_block 'wait for tomcat' do
+ruby_block 'wait for user_data' do
   block do
     true until ::File.exists?('/tmp/signal')
   end
