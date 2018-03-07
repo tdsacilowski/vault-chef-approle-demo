@@ -47,7 +47,6 @@ resource "aws_instance" "chef-node" {
     user_name  = "demo-admin"
     user_key   = "${data.aws_s3_bucket_object.chef_bootstrap_pem.body}"
 
-    #user_key                = "${var.chef_pem}"
     run_list                = ["recipe[vault_chef_approle_demo]"]
     recreate_client         = true
     fetch_chef_certificates = true
