@@ -8,20 +8,6 @@ provider "aws" {
 //--------------------------------------------------------------------
 // Resources
 
-resource "aws_kms_key" "vault" {
-  description             = "Vault unseal key"
-  deletion_window_in_days = 7
-
-  tags {
-    Name = "${var.environment_name}-vault-kms-unseal-key"
-  }
-}
-
-resource "aws_kms_alias" "vault" {
-  name          = "alias/${var.environment_name}-vault-kms-unseal-key"
-  target_key_id = "${aws_kms_key.vault.key_id}"
-}
-
 resource "aws_instance" "vault" {
   ami                         = "${data.aws_ami.ubuntu.id}"
   instance_type               = "${var.instance_type}"
@@ -136,19 +122,6 @@ data "aws_iam_policy_document" "assume_role" {
 
 data "aws_iam_policy_document" "vault" {
   statement {
-    sid    = "VaultKMSUnseal"
-    effect = "Allow"
-
-    actions = [
-      "kms:Encrypt",
-      "kms:Decrypt",
-      "kms:DescribeKey",
-    ]
-
-    resources = ["*"]
-  }
-
-  statement {
     sid    = "S3GetObject"
     effect = "Allow"
 
@@ -172,9 +145,8 @@ data "template_file" "vault" {
 
   vars = {
     tpl_aws_region              = "${var.aws_region}"
-    tpl_kms_key                 = "${aws_kms_key.vault.id}"
     tpl_s3_bucket_name          = "${var.s3_bucket_name}"
-    tpl_vault_zip_file          = "${var.vault_zip_file}"
+    tpl_vault_zip_url           = "${var.vault_zip_url}"
     tpl_chef_server_package_url = "${var.chef_server_package_url}"
     tpl_chef_dk_package_url     = "${var.chef_dk_package_url}"
     tpl_chef_admin              = "${var.chef_admin}"

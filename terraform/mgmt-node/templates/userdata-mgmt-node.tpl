@@ -21,11 +21,11 @@ USER_COMMENT="HashiCorp Vault user"
 USER_GROUP="vault"
 USER_HOME="/srv/vault"
 
-# S3 Bucket With Enterprise Binaries
+# S3 Bucket for demo
 S3_BUCKET="${tpl_s3_bucket_name}"
 
 # Vault
-VAULT_ZIP="${tpl_vault_zip_file}"
+VAULT_ZIP_URL="${tpl_vault_zip_url}"
 
 # Chef
 CHEF_SERVER_PACKAGE_URL="${tpl_chef_server_package_url}"
@@ -147,10 +147,10 @@ fi
 ## Install Vault
 
 logger "Downloading Vault"
-aws --region ${tpl_aws_region} s3 cp s3://$${S3_BUCKET}/$${VAULT_ZIP} /tmp/$${VAULT_ZIP}
+sudo curl -o /tmp/vault.zip $${VAULT_ZIP_URL}
 
 logger "Installing Vault"
-sudo unzip -o /tmp/$${VAULT_ZIP} -d /usr/local/bin/
+sudo unzip -o /tmp/vault.zip -d /usr/local/bin/
 sudo chmod 0755 /usr/local/bin/vault
 sudo chown vault:vault /usr/local/bin/vault
 sudo mkdir -pm 0755 /etc/vault.d
@@ -169,10 +169,6 @@ storage "file" {
 listener "tcp" {
   address     = "0.0.0.0:8200"
   tls_disable = 1
-}
-seal "awskms" {
-  region = "${tpl_aws_region}"
-  kms_key_id = "${tpl_kms_key}"
 }
 ui=true
 EOF
@@ -296,6 +292,23 @@ knife cookbook upload vault_chef_approle_demo
 ##--------------------------------------------------------------------
 ## Vault Init, Configure Policies & Backends, and Create Chef Databag
 
+sudo tee /home/ubuntu/demo_setup.sh <<'EOF'
+#!/usr/bin/env bash
+set -x
+
+# Automatically init and unseal Vault and save root token
+# DO NOT DO THIS IN PRODUCTION!!
+curl \
+    --silent \
+    --request PUT \
+    --data '{"secret_shares": 1, "secret_threshold": 1}' \
+    $${VAULT_ADDR}/v1/sys/init | tee \
+    >(jq -r .root_token > /home/ubuntu/vault-chef-approle-demo/vault/root-token) \
+    >(jq -r .keys[0] > /home/ubuntu/vault-chef-approle-demo/vault/unseal-key)
+
+vault operator unseal $(cat /home/ubuntu/vault-chef-approle-demo/vault/unseal-key)
+export VAULT_TOKEN=$(cat /home/ubuntu/vault-chef-approle-demo/vault/root-token)
+
 cd /home/ubuntu/vault-chef-approle-demo/vault/
 chmod +x scripts/provision.sh
 /home/ubuntu/vault-chef-approle-demo/vault/scripts/provision.sh
@@ -307,7 +320,9 @@ knife data bag from file secretid-token secretid-token.json
 knife data bag list
 knife data bag show secretid-token
 knife data bag show secretid-token approle-secretid-token
+EOF
 
+chmod +x /home/ubuntu/demo_setup.sh
 chown -R ubuntu:ubuntu /home/ubuntu
 
 logger "Complete"

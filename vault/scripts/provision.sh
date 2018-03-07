@@ -5,30 +5,6 @@ export VAULT_ADDR=http://127.0.0.1:8200
 export VAULT_SKIP_VERIFY=true
 
 ##--------------------------------------------------------------------
-## Initialize Vault
-
-# Initialization payload
-tee init.json <<EOF
-{
-    "secret_shares": 1,
-    "secret_threshold": 1,
-    "stored_shares": 1,
-    "recovery_shares": 1,
-    "recovery_threshold": 1,
-    "key_shares": 1,
-    "key_threshold": 1
-}
-EOF
-
-# Initialize Vault
-curl \
-    --request PUT \
-    --data @init.json \
-    $VAULT_ADDR/v1/sys/init > init-response.json
-
-export VAULT_TOKEN=$(cat init-response.json | jq -r .root_token)
-
-##--------------------------------------------------------------------
 ## Configure Audit Backend
 
 mkdir /home/ubuntu/vault-logs/

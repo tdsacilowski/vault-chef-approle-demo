@@ -43,8 +43,6 @@ Using Terraform Open Source:
 
 1. After cloning this repo, `cd` into the `vault-chef-approle-demo/terraform/mgmt-node` directory.
 2. Make sure to update the `terraform.tfvars.example` file accordingly and rename to `terraform.tfvars`.
-    - **_NOTE:_** this project assumes that a Vault Enterprise binary is being used so that we can take advantage of AWS KMS auto unseal functionality. To use the Open Source version of Vault, modify your `terraform.tfvars` and `/terraform/mgmt-node/templates/userdata-mgmt-node.tpl` files accordingly.
-    - **_TODO:_** add the ability to switch between Enterprise and Open Source versions.
 3. Perform a `terraform plan` to verify your changes and the resources that will be created. If all looks good, then perform a `terraform apply` to provision the resources.
     - The Terraform output will display the public IP address to SSH into your server.
 4. Once you can access your Vault + Chef server, run `tail -f /var/log/tf-user-data.log` to see when the initial configuration is complete. This might take several minutes since we're setting everything up from scratch. Once done, you'll see that we performed a `git clone` of this repository in order to pull down the appropriate Chef cookbook(s) and Vault configurations:
