@@ -8,4 +8,3 @@ variable vault_address {}
 variable vault_token {}
 variable chef_server_address {}
 variable ec2_pem {}
-variable chef_pem {}

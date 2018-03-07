@@ -170,7 +170,6 @@ listener "tcp" {
   address     = "0.0.0.0:8200"
   tls_disable = 1
 }
-ui=true
 EOF
 
 sudo chown -R vault:vault /etc/vault.d /etc/ssl/vault /opt/vault

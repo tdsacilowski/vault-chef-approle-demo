@@ -39,7 +39,7 @@ resource "aws_instance" "chef-node" {
     connection {
       type        = "ssh"
       user        = "ubuntu"
-      private_key = "${var.ec2_pem}"
+      private_key = "${file(var.ec2_pem)}"
     }
 
     node_name  = "chef-node-test"

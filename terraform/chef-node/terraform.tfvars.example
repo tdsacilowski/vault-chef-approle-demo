@@ -24,17 +24,5 @@ vault_token = ""
 # Chef Server IP address (public if you want to access from outside your VPC)
 chef_server_address = "https://10.0.0.0/organizations/demo-org"
 
-# SSH key for access to EC2 instance (for Chef provisioner connection)
-ec2_pem = <<EOF
------BEGIN RSA PRIVATE KEY-----
-supersecretkeystuffgoeshere...
------END RSA PRIVATE KEY-----
-EOF
-
-# Client key for for bootstrapping the node with Chef server
-# Not currently required... grabbing this from S3 bucket
-chef_pem = <<EOF
------BEGIN RSA PRIVATE KEY-----
-supersecretkeystuffgoeshere...
------END RSA PRIVATE KEY-----
-EOF
+# File path to EC2 SSH key (for Chef provisioner connection)
+ec2_pem = "/path/to/EC2/private_key.pem"
