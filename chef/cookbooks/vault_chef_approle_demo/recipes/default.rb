@@ -40,7 +40,7 @@ vault_token_data = data_bag_item('secretid-token', 'approle-secretid-token')
 var_vault_token = vault_token_data['auth']['client_token']
 
 # Configure token for Vault Gem (to retrieve SecretID)
-Vault.token   = var_vault_token
+Vault.token = var_vault_token
 
 # Get AppRole SecretID from Vault
 var_secret_id = Vault.approle.create_secret_id('app-1').data[:secret_id]
