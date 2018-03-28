@@ -19,7 +19,7 @@ resource "aws_instance" "vault" {
 
   tags {
     Owner = "Teddy-test"
-    #Name = "${var.environment_name}-vault-server"
+    Name = "${var.environment_name}-vault-server"
   }
 
   user_data = "${data.template_file.vault.rendered}"
